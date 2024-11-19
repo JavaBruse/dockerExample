@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Копируем .jar файл приложения в контейнер
-COPY target/front-1.0.jar /app/front-1.0.jar
+COPY target/dockerExample-1.0.jar /app/dockerExample-1.0.jar
 
 # Устанавливаем команду для запуска приложения
-CMD ["java", "-jar", "/app/front-1.0.jar"]
+CMD ["java", "-jar", "/app/dockerExample-1.0.jar"]

@@ -1,19 +1,11 @@
 version: '3.8'
 
 services:
-  front:
+  example:
     build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: front
-    image: front
-    networks:
-      app_network:
-        ipv4_address: 172.20.0.10  # Статический IP для контейнера
-    restart: unless-stopped
-    expose:
-      - "3000"  # Только внутри сети Docker
-
-networks:
-  app_network:
-    external: true  # Указываем, что сеть внешняя, но она должна быть заранее создана
+      dockerfile: Dockerfile # докер файл
+    container_name: front # имя контейнера
+    image: example # Образ докер
+    restart: unless-stopped # перезагрузка по любым случаям, кроме остановки контейнера.
+    ports:
+      - "0.0.0.0:80:80" # 80 порт приложения, 80 внешний порт докера, на локальный адресс устройства запуска.

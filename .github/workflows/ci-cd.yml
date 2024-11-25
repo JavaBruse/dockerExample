@@ -1,33 +1,30 @@
-name: Java CI with Maven
+name: Java CI/CD Pipeline # Имя
 
-on:
-  push:
+on: # Определяет события, которые запускают workflow
+  push: # Запускать workflow при пуше в указанные ветки
     branches:
-      - master
-  pull_request:
+      - master # Указываем ветку
+  pull_request: # Запускать workflow при создании или обновлении pull request
     branches:
-      - master
+      - master # Указываем ветку
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+jobs: # Определение джобов (наборов задач) для выполнения
+  build-and-test: # Имя джоба
+    name: Build and Test on Multiple OS # Человеко-читаемое имя джоба
+    runs-on: ${{ matrix.os }} # Используемая операционная система, выбирается из матрицы
+    strategy:
+      matrix: # Определение матрицы параметров для параллельного выполнения
+        os: [ubuntu-latest, windows-latest, macos-latest, macos-arm64] # Список операционных систем и архитектур (Linux, Windows, MacOS (Intel, Apple Silicon))
 
-    steps:
-      # Шаг 1: Клонирование репозитория
-      - name: Checkout code
-        uses: actions/checkout@v3
+    steps: # Последовательные шаги для выполнения джоба
+      - name: Checkout code # Шаг: Клонирование репозитория
+        uses: actions/checkout@v3 # Используем готовое действие для клонирования кода из репозитория
 
-      # Шаг 2: Установка JDK
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Set up JDK # Шаг: Установка Java Development Kit (JDK)
+        uses: actions/setup-java@v3 # Используем готовое действие для установки JDK
         with:
-          distribution: 'temurin' # OpenJDK
-          java-version: '17'     # версия Java
+          distribution: 'temurin' # Указываем дистрибутив OpenJDK (Temurin)
+          java-version: 17 # Устанавливаем фиксированную версию Java 17
 
-      # Шаг 2: Запуск тестов (намерено.)
-      - name: Test
-        run: mvn test
-
-      # Шаг 3: Сборка и запуск тестов
-      - name: Build with Maven
-        run: mvn clean install
+      - name: Build and Test # Шаг: Сборка проекта и запуск тестов
+        run: mvn clean install # Команда Maven для очистки, сборки и запуска тестов

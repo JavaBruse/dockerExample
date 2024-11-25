@@ -24,6 +24,10 @@ jobs:
           distribution: 'temurin' # OpenJDK
           java-version: '17'     # версия Java
 
+      # Шаг 2: Запуск тестов (намерено.)
+      - name: Test
+        run: mvn test
+
       # Шаг 3: Сборка и запуск тестов
       - name: Build with Maven
         run: mvn clean install

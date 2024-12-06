@@ -34,13 +34,11 @@ jobs: # Определение джобов (наборов задач) для �
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: 17
-
       - name: Build Application
         run: mvn clean package # Сборка JAR файла
 

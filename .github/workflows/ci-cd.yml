@@ -45,4 +45,8 @@ jobs: # Определение джобов (наборов задач) для �
         run: mvn clean package # Сборка JAR файла
 
       - name: Run Application
-        run: java -jar target/*.jar
+        run: |
+          java -jar target/*.jar &
+          sleep 5
+      - name: Test Application works
+        run: curl -v http://localhost:9090

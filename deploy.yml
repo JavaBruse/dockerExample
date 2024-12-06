@@ -1,0 +1,52 @@
+name: Java CI/CD Pipeline # Имя
+
+on: # Определяет события, которые запускают workflow
+  push: # Запускать workflow при пуше в указанные ветки
+    branches:
+      - master # Указываем ветку
+  pull_request: # Запускать workflow при создании или обновлении pull request
+    branches:
+      - master # Указываем ветку
+
+jobs: # Определение джобов (наборов задач) для выполнения
+  build-and-test: # Имя джоба
+    name: Build and Test on Multiple OS # Человеко-читаемое имя джоба
+    runs-on: ${{ matrix.os }} # Используемая операционная система, выбирается из матрицы
+    strategy:
+      matrix: # Определение матрицы параметров для параллельного выполнения
+        os: [ ubuntu-latest, windows-latest, macos-latest, macos-arm64 ] # Список операционных систем и архитектур (Linux, Windows, MacOS (Intel, Apple Silicon))
+
+    steps: # Последовательные шаги для выполнения джоба
+      - name: Checkout code # Шаг: Клонирование репозитория
+        uses: actions/checkout@v3 # Используем готовое действие для клонирования кода из репозитория
+
+      - name: Set up JDK # Шаг: Установка Java Development Kit (JDK)
+        uses: actions/setup-java@v3 # Используем готовое действие для установки JDK
+        with:
+          distribution: 'temurin' # Указываем дистрибутив OpenJDK (Temurin)
+          java-version: 17 # Устанавливаем фиксированную версию Java 17
+
+      - name: Build and Test # Шаг: Сборка проекта и запуск тестов
+        run: mvn clean install # Команда Maven для очистки, сборки и запуска тестов
+  deploy:
+    name: Deploy and Run on Server
+    runs-on: ubuntu-latest
+    needs: build-and-test  # Зависимость от предыдущего джоба
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: java-app
+      - name: Deploy Application
+        env:
+          SERVER_USER: "deployuser"   # Пользователь сервера
+          SERVER_IP: "192.168.1.100"      # IP адрес сервера
+          DEPLOY_PATH: "/opt/myapp"  # Путь на сервере для деплоя
+        run: |
+          # Копируем JAR файл на сервер
+          scp target/*.jar $SERVER_USER@$SERVER_IP:$DEPLOY_PATH/app.jar
+  
+          # Перезапускаем приложение
+          ssh $SERVER_USER@$SERVER_IP "
+          pkill -f 'java -jar app.jar' || true && \
+          nohup java -jar $DEPLOY_PATH/app.jar > $DEPLOY_PATH/app.log 2>&1 &"
